@@ -1,0 +1,35 @@
+version: "3.8"
+services:
+  http:
+    restart: unless-stopped
+    container_name: pool-agent
+    # Keep in mind that the .env file is a pre-processing step for this context, i.e. is usable for the args directive.
+    # When we also define the file under env_fil, we also fill the environment with the varables, for use in the container itself.
+    env_file: .env
+    image: harmony/agent
+    network_mode: host
+    build:
+      context: http-agent
+      args:
+        HARMONY_USER: $HARMONY_USER
+        HARMONY_GROUP: $HARMONY_GROUP
+    volumes:
+       - ./src/:$HARMONY_WORKDIR/app/
+  tcp:
+    restart: unless-stopped
+    container_name: tcp-proxy
+    # Keep in mind that the .env file is a pre-processing step for this context, i.e. is usable for the args directive.
+    # When we also define the file under env_fil, we also fill the environment with the varables, for use in the container itself.
+    env_file: .env
+    image: harmony/proxy
+    network_mode: host
+    build:
+      context: tcp-proxy
+      args:
+        HARMONY_USER: $HARMONY_USER
+        HARMONY_GROUP: $HARMONY_GROUP
+    volumes:
+       - ./src/:$HARMONY_WORKDIR/app/
+networks:
+  default:
+    name: harmony-net
